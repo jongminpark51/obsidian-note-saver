@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "relative_path": {
+      "type": "string",
+      "description": "Vault 기준 상대 파일 경로. 반드시 .md로 끝난다."
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["quick", "daily", "meeting", "project", "project-doc", "reference", "query", "prompt", "note"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["inbox", "active", "waiting", "done", "archived"]
+    },
+    "area": {
+      "type": "string"
+    },
+    "project": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "moc_relative_path": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string",
+      "description": "YAML front matter를 제외한 정리된 Markdown 본문"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "relative_path",
+    "title",
+    "type",
+    "status",
+    "area",
+    "project",
+    "source",
+    "tags",
+    "moc_relative_path",
+    "body",
+    "reason"
+  ]
+}

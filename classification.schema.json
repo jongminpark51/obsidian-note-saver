@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "relative_path": {
+      "type": "string",
+      "description": "Vault 기준 상대 파일 경로. 반드시 .md로 끝난다."
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["quick", "daily", "meeting", "project", "project-doc", "reference", "query", "prompt", "note"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["inbox", "active", "waiting", "done", "archived"]
+    },
+    "area": {
+      "type": "string"
+    },
+    "project": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "moc_relative_path": {
+      "type": "string",
+      "description": "업데이트할 MOC가 명확히 있을 때만 Vault 기준 상대 경로를 넣는다. 없으면 빈 문자열."
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "relative_path",
+    "title",
+    "type",
+    "status",
+    "area",
+    "project",
+    "source",
+    "tags",
+    "moc_relative_path",
+    "reason"
+  ]
+}
