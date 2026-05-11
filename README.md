@@ -1,67 +1,299 @@
 ﻿# Obsidian Note Saver
 
-Obsidian Vault에 간단한 메모를 입력하면 Gemini 또는 Codex CLI를 통해 적절한 폴더와 속성으로 저장하는 Windows 앱입니다.
+<p align="center">
+  <img src="Assets/obsidian-note-saver-penguin.png" width="150" alt="Obsidian Note Saver icon">
+</p>
 
-## 실행
-바탕화면의 `Obsidian Note Saver` 바로가기를 실행하거나, 이 폴더의 `ObsidianNoteSaver.cmd`를 더블클릭합니다.
+<p align="center">
+  <strong>A small Windows helper app that turns quick thoughts into organized Obsidian notes.</strong>
+</p>
 
-## 작업표시줄
-- 시작 메뉴의 `Obsidian Note Saver` 바로가기를 작업표시줄에 고정할 수 있습니다.
-- `PinToTaskbar.cmd`를 실행하면 고정할 바로가기 위치가 열립니다.
-- Windows에서 자동 작업표시줄 고정이 제한될 수 있으므로, 열린 바로가기를 우클릭한 뒤 `작업 표시줄에 고정`을 선택합니다.
+<p align="center">
+  <img alt="Windows" src="https://img.shields.io/badge/Windows-WPF-0078D4">
+  <img alt="PowerShell" src="https://img.shields.io/badge/PowerShell-5.1+-5391FE">
+  <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-Vault-7C3AED">
+  <img alt="Gemini CLI" src="https://img.shields.io/badge/Gemini_CLI-supported-4285F4">
+  <img alt="Codex CLI" src="https://img.shields.io/badge/Codex_CLI-supported-111827">
+</p>
 
-## 단축키
-- 바탕화면 `Obsidian Note Saver` 바로가기에 `Ctrl + Alt + O` 단축키가 설정되어 있습니다.
+Obsidian Note Saver is a lightweight Windows desktop app for people who capture notes quickly but do not want to manually decide where every note belongs. Paste a rough memo, choose a save mode, and the app uses Gemini CLI or Codex CLI to classify the note, add front matter, and save it into the right place in your Obsidian vault.
 
-## 저장 모드
-- `내용 다듬기`: 선택한 AI 엔진이 내용을 정리하고 템플릿 구조에 맞춰 저장합니다.
-- `원문 유지`: 선택한 AI 엔진은 분류 계획만 만들고, 프로그램은 원문을 그대로 둔 채 properties와 저장 위치만 적용합니다.
+The project was built for a PARA-style Obsidian vault, but the rules are intentionally simple enough to adapt.
 
-## AI 엔진
-- `Gemini`: Gemini CLI를 사용합니다. 설치되어 있으면 기본 선택됩니다.
-- `Codex`: Codex CLI를 사용합니다. Gemini가 없거나 직접 선택한 경우 사용합니다.
+## Who This Is For
 
-## 버튼
-- `저장하기`: 선택한 저장 모드로 문서를 생성합니다.
-- `Inbox에 바로 저장`: AI를 호출하지 않고 `00 Inbox/`에 빠른 메모 형식으로 저장합니다.
-- `크게 보기`: 입력 내용을 별도 창에서 확인하고 편집합니다.
-- `Obsidian에서 열기`: 마지막으로 생성된 문서를 Obsidian URI로 엽니다.
-- `경로 복사`: 완료된 파일 경로를 클립보드에 복사합니다.
+- Obsidian users who capture many rough notes throughout the day.
+- People who use a PARA-like vault structure such as `00 Inbox`, `10 Projects`, `20 Areas`, and `30 Resources`.
+- Operators, PMs, researchers, and makers who want meeting notes, ideas, and working docs filed without breaking focus.
+- Users who already use CLI AI tools such as Gemini CLI or Codex CLI and want those tools wrapped in a small desktop workflow.
+- Anyone who wants an "inbox first, organize later" workflow, but with AI-assisted filing when the note is ready.
 
-## 입력 영역
-- 기본 창 높이를 키웠고, 내용 입력칸에는 세로 스크롤이 항상 표시됩니다.
-- 내용 입력칸 위에 글자 수와 줄 수를 표시합니다.
-- 긴 메모는 `크게 보기`에서 넓은 편집창으로 확인할 수 있습니다.
+## What It Does
 
-## 진행 표시
-- `저장하기`를 누르면 진행바와 현재 단계 문구가 표시됩니다.
-- Gemini/Codex 응답이 JSON이 아닐 경우 원본 응답은 `.tmp` 폴더에 저장됩니다.
-- 마지막 오류는 `.tmp/last-error.txt`에서 확인할 수 있습니다.
+- Saves a memo directly into an Obsidian vault as Markdown.
+- Classifies notes into folders based on content and title.
+- Adds YAML front matter for note type, tags, summary, source, and timestamps.
+- Supports two save styles:
+  - `내용 다듬기`: refine and structure the content before saving.
+  - `원문 유지`: preserve the original body and only apply folder/properties.
+- Supports a fast `Inbox에 바로 저장` path that skips AI.
+- Shows progress while the AI process is running, so the save action does not feel like the app froze.
+- Opens the saved note in Obsidian with an `obsidian://` URI.
+- Copies the saved file path when needed.
+- Provides Windows shortcuts and a taskbar-friendly launcher.
 
-## 아이콘
-- 앱 아이콘은 `Assets/obsidian-note-saver-penguin.png`와 `Assets/obsidian-note-saver-penguin.ico`를 사용합니다.
-- 아이콘은 펭귄 마스코트와 문서 체크 표시를 조합한 이미지입니다.
+## Workflow
 
-## 저장 기준
-- 성격이 명확하면 `10 Projects`, `20 Areas`, `30 Resources` 중 적합한 위치에 저장합니다.
-- 성격이 불명확하면 `00 Inbox`에 저장합니다.
-- 기존 파일은 덮어쓰지 않는 것을 기본 규칙으로 합니다.
+```text
+Paste memo
+  -> choose type and save mode
+  -> choose Gemini or Codex
+  -> AI returns a JSON save plan
+  -> app validates the path stays inside the vault
+  -> Markdown file is written
+  -> open in Obsidian or copy the saved path
+```
 
-## 점검
-터미널에서 아래 명령으로 기본 경로, 아이콘, JSON 스키마, CLI 인식 여부를 확인할 수 있습니다.
+For quick capture, use `Inbox에 바로 저장`:
+
+```text
+Paste memo
+  -> Inbox save
+  -> 00 Inbox/YYYY-MM-DD_title.md
+```
+
+## Vault Layout
+
+The app assumes it lives inside the vault at:
+
+```text
+<Obsidian Vault>/
+  00 Inbox/
+  10 Projects/
+  20 Areas/
+  30 Resources/
+    Tools/
+      ObsidianNoteSaver/
+```
+
+The vault root is inferred from the app folder by walking up three levels. In this setup, `ObsidianNoteSaver.ps1` resolves the vault as `..\..\..`.
+
+Default folder behavior:
+
+- `00 Inbox`: unclear or quick-capture notes.
+- `10 Projects`: project-specific notes with a clear outcome.
+- `20 Areas`: ongoing responsibility areas.
+- `30 Resources`: reusable references, prompts, tools, and knowledge.
+
+## Requirements
+
+- Windows 10 or 11.
+- Windows PowerShell 5.1 or later.
+- Obsidian installed and associated with your vault.
+- At least one supported CLI AI tool:
+  - Gemini CLI: recommended default when available.
+  - Codex CLI: supported alternative.
+
+Gemini CLI is preferred if you want the app to avoid Codex token usage.
+
+## Install
+
+Place this project at:
+
+```text
+<Obsidian Vault>\30 Resources\Tools\ObsidianNoteSaver
+```
+
+Then run:
+
+```powershell
+.\InstallShortcuts.cmd
+```
+
+This creates:
+
+- Desktop shortcut: `Obsidian Note Saver`
+- Start Menu shortcut: `Obsidian Note Saver`
+- Hotkey on the desktop shortcut: `Ctrl + Alt + O`
+
+To launch manually:
+
+```powershell
+.\ObsidianNoteSaver.cmd
+```
+
+## Pin To Taskbar
+
+Windows often blocks apps from pinning themselves to the taskbar automatically. This project uses a safe helper instead:
+
+```powershell
+.\PinToTaskbar.cmd
+```
+
+That opens the Start Menu shortcut location. Right-click `Obsidian Note Saver`, then choose `작업 표시줄에 고정`.
+
+## Usage
+
+1. Open `Obsidian Note Saver`.
+2. Add a title hint.
+3. Paste the note body.
+4. Choose a note type.
+5. Choose an AI provider: `Gemini` or `Codex`.
+6. Choose a save mode:
+   - `내용 다듬기`: AI rewrites and structures the note.
+   - `원문 유지`: AI only classifies; the original body is preserved.
+7. Click `저장하기`.
+8. Open the note in Obsidian or copy the saved path.
+
+For immediate capture without AI, click `Inbox에 바로 저장`.
+
+## Save Modes
+
+### 내용 다듬기
+
+Use this when your memo is messy and you want it turned into a cleaner note.
+
+Good for:
+
+- meeting notes
+- planning notes
+- idea dumps
+- research snippets
+- rough outlines
+
+### 원문 유지
+
+Use this when the content itself should not be rewritten.
+
+Good for:
+
+- quoted notes
+- raw meeting transcripts
+- exact decisions
+- pasted external text
+- notes where wording matters
+
+## AI Providers
+
+### Gemini CLI
+
+If Gemini CLI is installed, the app selects it by default.
+
+The app asks Gemini to return JSON that matches the local schema, then writes the file itself. This keeps file writes inside the app and makes path validation simpler.
+
+### Codex CLI
+
+Codex CLI is also supported. It can be selected manually in the app.
+
+Codex is useful if your local Codex setup has better context or if you want to reuse an existing Codex workflow.
+
+## Safety
+
+- The app validates that AI-proposed paths stay inside the vault.
+- Existing files are not overwritten; duplicate names get a suffix.
+- If AI output is not valid JSON, the raw response is saved under `.tmp` for debugging.
+- The last error is written to `.tmp/last-error.txt`.
+- The fast Inbox path does not call AI.
+
+## Project Structure
+
+```text
+ObsidianNoteSaver/
+  Assets/
+    obsidian-note-saver-penguin.png
+    obsidian-note-saver-penguin.ico
+  ObsidianNoteSaver.ps1
+  ObsidianNoteSaver.cmd
+  InstallShortcuts.ps1
+  InstallShortcuts.cmd
+  PinToTaskbar.cmd
+  classification.schema.json
+  refine.schema.json
+  README.md
+  PROJECT.md
+```
+
+## Checks
+
+Run the setup check:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\ObsidianNoteSaver.ps1" -SelfTest
 ```
 
-UI만 로딩되는지 확인하려면 다음 명령을 사용합니다.
+Run the UI load check:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File ".\ObsidianNoteSaver.ps1" -UiSelfTest
 ```
 
-바탕화면과 시작 메뉴 바로가기를 다시 만들려면 다음 명령을 사용합니다.
+Expected checks include:
+
+- vault path
+- prompt path
+- inbox folder
+- assets
+- JSON schemas
+- Codex CLI availability
+- Gemini CLI availability
+
+## Troubleshooting
+
+### The app opens, but saving fails
+
+Check:
+
+```text
+.tmp/last-error.txt
+```
+
+If the AI response was malformed, also check files under `.tmp`.
+
+### Gemini or Codex is not detected
+
+Open a new terminal and run:
+
+```powershell
+gemini --version
+codex --version
+```
+
+If the command is missing, install the CLI or make sure it is available in `PATH`.
+
+### The note opens in File Explorer but not Obsidian
+
+Make sure Obsidian is installed and the target vault has been opened at least once. The app uses an `obsidian://open` URI.
+
+### The taskbar icon does not update
+
+Run:
 
 ```powershell
 .\InstallShortcuts.cmd
 ```
+
+Then unpin and pin the Start Menu shortcut again.
+
+## Customization
+
+The classification behavior is mostly controlled by:
+
+- the prompt file in your vault: `30 Resources\Prompt\2026-05-07_Obsidian_문서_저장_프롬프트.md`
+- `classification.schema.json`
+- `refine.schema.json`
+- the folder rules in `ObsidianNoteSaver.ps1`
+
+For another vault layout, update the folder rules and prompt together.
+
+## Roadmap Ideas
+
+- Config file for vault path and folder rules.
+- Tray icon mode.
+- Save templates per note type.
+- Optional daily note integration.
+- More portable installer.
+- Multi-vault support.
+
+## Notes
+
+This is a personal productivity tool, not a general Obsidian plugin. It is intentionally implemented as a Windows helper app so it can call local CLI tools and write directly into the vault.
