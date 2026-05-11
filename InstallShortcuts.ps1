@@ -5,10 +5,9 @@
 $ErrorActionPreference = 'Stop'
 
 $ProjectDir = $PSScriptRoot
-$MainCmd = Join-Path $ProjectDir 'ObsidianNoteSaver.cmd'
-$MainScript = Join-Path $ProjectDir 'ObsidianNoteSaver.ps1'
+$LauncherExe = Join-Path $ProjectDir 'ObsidianNoteSaver.exe'
+$BuildLauncherScript = Join-Path $ProjectDir 'BuildLauncher.ps1'
 $IconPath = Join-Path $ProjectDir 'Assets\obsidian-note-saver-penguin.ico'
-$PowerShellExe = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
 $OneDriveDesktop = Join-Path $env:USERPROFILE 'OneDrive\Desktop'
 $Desktop = [Environment]::GetFolderPath('Desktop')
 if (Test-Path -LiteralPath $OneDriveDesktop) {
@@ -19,8 +18,16 @@ elseif ([string]::IsNullOrWhiteSpace($Desktop)) {
 }
 
 $StartMenuDir = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Obsidian Note Saver'
+$TaskbarDir = Join-Path $env:APPDATA 'Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar'
 
 New-Item -ItemType Directory -Force -Path $Desktop, $StartMenuDir | Out-Null
+
+if (-not (Test-Path -LiteralPath $LauncherExe)) {
+    if (-not (Test-Path -LiteralPath $BuildLauncherScript)) {
+        throw "런처 빌드 스크립트를 찾을 수 없습니다: $BuildLauncherScript"
+    }
+    & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $BuildLauncherScript | Out-Null
+}
 
 $shell = New-Object -ComObject WScript.Shell
 
@@ -49,10 +56,19 @@ function New-AppShortcut {
 
 $desktopMain = Join-Path $Desktop 'Obsidian Note Saver.lnk'
 $startMain = Join-Path $StartMenuDir 'Obsidian Note Saver.lnk'
-$mainArgs = "-NoLogo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -STA -File `"$MainScript`""
+$taskbarMain = Join-Path $TaskbarDir 'Obsidian Note Saver.lnk'
+$legacyTaskbarWidget = Join-Path $TaskbarDir 'Obsidian Note Saver Widget.lnk'
 
-New-AppShortcut -Path $desktopMain -Target $PowerShellExe -Arguments $mainArgs -Description 'Save quick notes into Obsidian' -Hotkey 'CTRL+ALT+O'
-New-AppShortcut -Path $startMain -Target $PowerShellExe -Arguments $mainArgs -Description 'Save quick notes into Obsidian'
+New-AppShortcut -Path $desktopMain -Target $LauncherExe -Description 'Save quick notes into Obsidian' -Hotkey 'CTRL+ALT+O'
+New-AppShortcut -Path $startMain -Target $LauncherExe -Description 'Save quick notes into Obsidian'
+
+if (Test-Path -LiteralPath $legacyTaskbarWidget) {
+    New-AppShortcut -Path $legacyTaskbarWidget -Target $LauncherExe -Description 'Save quick notes into Obsidian'
+}
+
+if (Test-Path -LiteralPath $taskbarMain) {
+    New-AppShortcut -Path $taskbarMain -Target $LauncherExe -Description 'Save quick notes into Obsidian'
+}
 
 $ie4uinit = Join-Path $env:WINDIR 'System32\ie4uinit.exe'
 if (Test-Path -LiteralPath $ie4uinit) {
@@ -66,4 +82,6 @@ if ($OpenPinLocation) {
 [PSCustomObject]@{
     DesktopMain = $desktopMain
     StartMenuMain = $startMain
+    RepairedLegacyTaskbarWidget = (Test-Path -LiteralPath $legacyTaskbarWidget)
+    RepairedTaskbarMain = (Test-Path -LiteralPath $taskbarMain)
 }

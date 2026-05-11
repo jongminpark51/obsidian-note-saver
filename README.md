@@ -116,10 +116,18 @@ This creates:
 - Start Menu shortcut: `Obsidian Note Saver`
 - Hotkey on the desktop shortcut: `Ctrl + Alt + O`
 
+The shortcut target is `ObsidianNoteSaver.exe`, a tiny launcher that starts the PowerShell WPF app. This makes Windows taskbar pinning more reliable than pinning `powershell.exe` with script arguments.
+
 To launch manually:
 
 ```powershell
 .\ObsidianNoteSaver.cmd
+```
+
+To rebuild the launcher executable:
+
+```powershell
+.\BuildLauncher.cmd
 ```
 
 ## Pin To Taskbar
@@ -131,6 +139,14 @@ Windows often blocks apps from pinning themselves to the taskbar automatically. 
 ```
 
 That opens the Start Menu shortcut location. Right-click `Obsidian Note Saver`, then choose `작업 표시줄에 고정`.
+
+If an older taskbar item points to the removed widget launcher, run:
+
+```powershell
+.\InstallShortcuts.cmd
+```
+
+The installer repairs existing `Obsidian Note Saver` taskbar shortcuts and the legacy `Obsidian Note Saver Widget` pinned shortcut so they launch `ObsidianNoteSaver.exe`.
 
 ## Usage
 
@@ -204,6 +220,9 @@ ObsidianNoteSaver/
     obsidian-note-saver-penguin.ico
   ObsidianNoteSaver.ps1
   ObsidianNoteSaver.cmd
+  ObsidianNoteSaverLauncher.cs
+  BuildLauncher.ps1
+  BuildLauncher.cmd
   InstallShortcuts.ps1
   InstallShortcuts.cmd
   PinToTaskbar.cmd
